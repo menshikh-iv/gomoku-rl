@@ -7,9 +7,10 @@ class GomokuEnv(object):
     O = 2
     DRAW = 3
 
-    def __init__(self, board_size=19, win_len=5):
+    def __init__(self, board_size, win_len):
         assert board_size >= 3
         assert win_len >= 3
+        assert win_len <= board_size
 
         self._field = None
         self._current_step = GomokuEnv.X
@@ -79,5 +80,9 @@ class GomokuEnv(object):
                     continue
                 result_str += "X\t" if el == GomokuEnv.X else "O\t"
             result_str += "|\n"
-        result_str += "-\t" * (self._size + 2) + "\n"
+        result_str += "-\t" * (self._size + 2) + "\n\n"
         return result_str
+
+    def available_turns(self):
+        x_idx, y_idx = np.where(self._field == GomokuEnv.NOBODY)
+        return zip(x_idx, y_idx)
