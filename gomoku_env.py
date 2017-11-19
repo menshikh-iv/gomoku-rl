@@ -1,3 +1,4 @@
+import itertools as it
 import numpy as np
 
 
@@ -6,6 +7,19 @@ class GomokuEnv(object):
     X = 1
     O = 2
     DRAW = 3
+
+    @staticmethod
+    def get_all_diags(matr):
+        return \
+            [matr[::-1, :].diagonal(i).tolist() for i in range(-matr.shape[0] + 1, matr.shape[1])] + \
+            [matr.diagonal(i).tolist() for i in range(matr.shape[1] - 1, -matr.shape[0], -1)]
+
+    @staticmethod
+    def comb(arr, size):
+        if len(arr) == 3:
+            return [arr]
+
+        return [arr[a: b] for a, b in zip(range(0, len(arr) - size + 1), range(size, len(arr) + 1))]
 
     def __init__(self, board_size, win_len):
         assert board_size >= 3
@@ -40,21 +54,17 @@ class GomokuEnv(object):
         return self._who_is_winner()
 
     def _who_is_winner(self):
-        combinations = \
-            [self._field[::-1, :].diagonal(i).tolist()
-             for i in range(-self._field.shape[0] + 1, self._field .shape[1])] + \
-            [self._field.diagonal(i).tolist()
-             for i in range(self._field.shape[1] - 1, -self._field.shape[0], -1)] + \
-            [self._field[idx][a: b].tolist()
-             for a in range(self._size)
-             for b in range(self._size + 1)
-             for idx in range(self._size)
-             if (b - a) == self._win_len] + \
-            [np.transpose(self._field)[idx][a: b].tolist()
-             for a in range(self._size)
-             for b in range(self._size + 1)
-             for idx in range(self._size)
-             if (b - a) == self._win_len]
+        combinations = GomokuEnv.get_all_diags(self._field)
+        combinations = [diag for diag in combinations if len(diag) >= self._win_len]
+        combinations.extend(
+            it.chain.from_iterable([GomokuEnv.comb(diag, self._win_len) for diag in combinations])
+        )
+        combinations.extend(
+            it.chain.from_iterable(GomokuEnv.comb(row.tolist(), self._win_len) for row in self._field)
+        )
+        combinations.extend(
+            it.chain.from_iterable(GomokuEnv.comb(row.tolist(), self._win_len) for row in np.transpose(self._field))
+        )
 
         combinations = [set(_) for _ in combinations if len(_) == self._win_len]
 
