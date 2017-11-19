@@ -2,20 +2,20 @@ from random import choice
 from gomoku_env import GomokuEnv
 
 
-def player1_turn(available_turns):
-    return choice(available_turns)
+def player1_turn(env):
+    return choice(env.available_turns())
 
 
-def player2_turn(available_turns):
-    return choice(available_turns)
+def player2_turn(env):
+    return choice(env.available_turns())
 
 
 env = GomokuEnv(board_size=3, win_len=3)
 
 while True:
-    print("step")
-    environment, winner = env.step(env.X, player1_turn(env.available_turns()))
-    print(env.render())
+    p1_turn = player1_turn(env)
+    winner = env.step(env.X, p1_turn)
+    env.render()
 
     if winner != env.NOBODY:
         if winner == env.X:
@@ -26,8 +26,9 @@ while True:
             print("---=== Winner: `DRAW` ===---")
         break
 
-    environment, winner = env.step(env.O, player2_turn(env.available_turns()))
-    print(env.render())
+    p2_turn = player2_turn(env)
+    winner = env.step(env.O, p2_turn)
+    env.render()
 
     if winner != env.NOBODY:
         if winner == env.X:

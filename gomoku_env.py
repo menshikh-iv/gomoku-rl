@@ -37,7 +37,7 @@ class GomokuEnv(object):
 
         self._field[x][y] = player
         self._current_step = GomokuEnv.X if player == GomokuEnv.O else GomokuEnv.O
-        return np.copy(self._field), self._who_is_winner()
+        return self._who_is_winner()
 
     def _who_is_winner(self):
         combinations = \
@@ -47,16 +47,16 @@ class GomokuEnv(object):
              for i in range(self._field.shape[1] - 1, -self._field.shape[0], -1)] + \
             [self._field[idx][a: b].tolist()
              for a in range(self._size)
-             for b in range(self._size)
+             for b in range(self._size + 1)
              for idx in range(self._size)
              if (b - a) == self._win_len] + \
-            [self._field[::-1, :][idx][a: b].tolist()
+            [np.transpose(self._field)[idx][a: b].tolist()
              for a in range(self._size)
-             for b in range(self._size)
+             for b in range(self._size + 1)
              for idx in range(self._size)
              if (b - a) == self._win_len]
 
-        combinations = [set(_) for _ in combinations if len(_) >= self._win_len]
+        combinations = [set(_) for _ in combinations if len(_) == self._win_len]
 
         if {GomokuEnv.O} in combinations:
             return GomokuEnv.O
@@ -81,7 +81,7 @@ class GomokuEnv(object):
                 result_str += "X\t" if el == GomokuEnv.X else "O\t"
             result_str += "|\n"
         result_str += "-\t" * (self._size + 2) + "\n\n"
-        return result_str
+        print(result_str)
 
     def available_turns(self):
         x_idx, y_idx = np.where(self._field == GomokuEnv.NOBODY)
