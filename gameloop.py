@@ -1,3 +1,6 @@
+from gomoku_env import BoardState
+
+
 class Game(object):
     def __init__(self, env, agent1_func, agent2_func):
         self.env = env
@@ -5,29 +8,31 @@ class Game(object):
         self.a2 = agent2_func
 
     def loop(self):
-        while True:
-            p1_turn = self.a1(self.env)
-            winner = self.env.step(self.env.X, p1_turn)
-            self.env.render()
+        state = self.env.getstate()
 
-            if winner != self.env.NOBODY:
-                if winner == self.env.X:
+        while True:
+            p1_turn = self.a1(state)
+            state, winner = self.env.step(BoardState.X, p1_turn)
+            print(state.render())
+
+            if winner != BoardState.NOBODY:
+                if winner == BoardState.X:
                     print("---=== Winner: `X` ===---")
-                elif winner == self.env.O:
+                elif winner == BoardState.O:
                     print("---=== Winner: `O` ===---")
-                elif winner == self.env.DRAW:
+                elif winner == BoardState.DRAW:
                     print("---=== Winner: `DRAW` ===---")
                 return winner
 
-            p2_turn = self.a2(self.env)
-            winner = self.env.step(self.env.O, p2_turn)
-            self.env.render()
+            p2_turn = self.a2(state)
+            state, winner = self.env.step(BoardState.O, p2_turn)
+            print(state.render())
 
-            if winner != self.env.NOBODY:
-                if winner == self.env.X:
+            if winner != BoardState.NOBODY:
+                if winner == BoardState.X:
                     print("---=== Winner: `X` ===---")
-                elif winner == self.env.O:
+                elif winner == BoardState.O:
                     print("---=== Winner: `O` ===---")
-                elif winner == self.env.DRAW:
+                elif winner == BoardState.DRAW:
                     print("---=== Winner: `DRAW` ===---")
                 return winner
