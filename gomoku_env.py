@@ -85,4 +85,4 @@ class GomokuEnv(object):
 
     def available_turns(self):
         x_idx, y_idx = np.where(self._field == GomokuEnv.NOBODY)
-        return zip(x_idx, y_idx)
+        return list(zip(x_idx, y_idx))
